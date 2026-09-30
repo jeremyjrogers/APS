@@ -1,0 +1,51 @@
+databases:
+  - name: aps-db
+    databaseName: aps
+    user: aps
+    plan: free
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: aps-backend
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # `alembic upgrade head` runs on every start (including free-tier
+    # cold-start wakeups) rather than as a separate pre-deploy step — it's a
+    # no-op once the schema is current, and this avoids depending on a
+    # pre-deploy-command feature that may be paid-plan-only.
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aps-db
+          property: connectionString
+      # Render's `fromService` only exposes private-network addressing
+      # (unreachable from a browser), so this has to be the real public URL.
+      # It's predictable — Render serves each service at
+      # https://<name>.onrender.com — but if "aps-frontend" collides with
+      # someone else's service globally, Render will suffix it and you'll
+      # need to update this to match and redeploy.
+      - key: CORS_ORIGINS
+        value: https://aps-frontend.onrender.com
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+
+  - type: web
+    name: aps-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      # Same caveat as CORS_ORIGINS above — update if "aps-backend" collides.
+      # Baked in at build time (Vite), so changing this needs a rebuild, not
+      # just a restart.
+      - key: VITE_API_BASE
+        value: https://aps-backend.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

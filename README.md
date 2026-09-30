@@ -51,3 +51,36 @@ cd frontend
 npm install
 npm run dev
 ```
+
+## Deploying (Render, free tier)
+
+`render.yaml` at the repo root defines a Blueprint: free Postgres, a Python
+web service for the backend, and a static site for the frontend.
+
+1. Push this repo to GitHub (Render deploys from a repo, not a local
+   checkout).
+2. In the Render dashboard: **New > Blueprint**, point it at the repo. It
+   reads `render.yaml` and creates all three resources in one go.
+3. Once the backend is live, open a shell for the `aps-backend` service
+   (Render dashboard → Shell) and seed it once:
+   ```bash
+   python scripts/seed.py --reset
+   ```
+   Do this once after the first deploy — it's a full reset, not something to
+   run on every deploy.
+4. Visit the `aps-frontend` service's URL.
+
+**Known limitations of the free tier:**
+- Free Postgres expires 30 days after creation (14-day grace period after
+  that before deletion). For a short-lived demo this is fine; for anything
+  longer, upgrade the database plan (~$7/mo) before day 30.
+- The free backend spins down after 15 min idle; the first request after
+  that takes about a minute to wake it back up. The frontend (a static site)
+  has no such delay.
+- `CORS_ORIGINS` and `VITE_API_BASE` in `render.yaml` are hardcoded to the
+  services' predictable `https://<name>.onrender.com` URLs (Render's
+  Blueprint cross-service references only expose private-network addressing,
+  which a browser can't reach). If either service name collides with an
+  existing Render service and gets auto-suffixed, update the corresponding
+  env var to match and redeploy — the frontend one needs a rebuild since
+  Vite bakes it in at build time, not just a restart.

@@ -1,4 +1,9 @@
-const API_BASE = "http://localhost:8000";
+// Set via Render's build-time env var in production; falls back to the local
+// backend for `npm run dev`. Normalized defensively in case the env var is
+// handed to us as a bare host (Render's cross-service reference) rather than
+// a full URL.
+const RAW_API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const API_BASE = /^https?:\/\//.test(RAW_API_BASE) ? RAW_API_BASE : `https://${RAW_API_BASE}`;
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`);
