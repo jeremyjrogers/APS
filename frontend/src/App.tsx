@@ -3,6 +3,7 @@ import "./App.css";
 import Overview from "./components/Overview";
 import ExceptionsWorkbench from "./components/ExceptionsWorkbench";
 import PeggingView from "./components/PeggingView";
+import CapacityDashboard from "./components/CapacityDashboard";
 import ProjectsTable from "./components/ProjectsTable";
 import SalesOrdersTable from "./components/SalesOrdersTable";
 import OverhaulJobsTable from "./components/OverhaulJobsTable";
@@ -11,12 +12,14 @@ import PurchaseOrdersTable from "./components/PurchaseOrdersTable";
 import ActionLog from "./components/ActionLog";
 import MasterData from "./components/MasterData";
 import ImportData from "./components/ImportData";
+import ErrorBoundary from "./components/ErrorBoundary";
 import type { PlanningRunResult } from "./api";
 
 const TABS = [
   "Overview",
   "Exceptions",
   "Root Cause",
+  "Capacity",
   "Projects",
   "Sales Orders",
   "Overhaul Jobs",
@@ -54,17 +57,20 @@ function App() {
       </nav>
 
       <main className="app-main">
-        {tab === "Overview" && <Overview lastRun={lastRun} onRunComplete={setLastRun} />}
-        {tab === "Exceptions" && <ExceptionsWorkbench onDrillDown={drillDown} />}
-        {tab === "Root Cause" && <PeggingView sourceRef={pegRef} onSourceRefChange={setPegRef} />}
-        {tab === "Projects" && <ProjectsTable />}
-        {tab === "Sales Orders" && <SalesOrdersTable />}
-        {tab === "Overhaul Jobs" && <OverhaulJobsTable />}
-        {tab === "Work Orders" && <WorkOrdersTable />}
-        {tab === "Purchase Orders" && <PurchaseOrdersTable />}
-        {tab === "Master Data" && <MasterData />}
-        {tab === "Import" && <ImportData />}
-        {tab === "Action Log" && <ActionLog />}
+        <ErrorBoundary key={tab} label={tab}>
+          {tab === "Overview" && <Overview lastRun={lastRun} onRunComplete={setLastRun} />}
+          {tab === "Exceptions" && <ExceptionsWorkbench onDrillDown={drillDown} />}
+          {tab === "Root Cause" && <PeggingView sourceRef={pegRef} onSourceRefChange={setPegRef} />}
+          {tab === "Capacity" && <CapacityDashboard lastRun={lastRun} />}
+          {tab === "Projects" && <ProjectsTable />}
+          {tab === "Sales Orders" && <SalesOrdersTable />}
+          {tab === "Overhaul Jobs" && <OverhaulJobsTable />}
+          {tab === "Work Orders" && <WorkOrdersTable />}
+          {tab === "Purchase Orders" && <PurchaseOrdersTable />}
+          {tab === "Master Data" && <MasterData />}
+          {tab === "Import" && <ImportData />}
+          {tab === "Action Log" && <ActionLog />}
+        </ErrorBoundary>
       </main>
     </div>
   );
