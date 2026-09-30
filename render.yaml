@@ -24,12 +24,12 @@ services:
           property: connectionString
       # Render's `fromService` only exposes private-network addressing
       # (unreachable from a browser), so this has to be the real public URL.
-      # It's predictable — Render serves each service at
-      # https://<name>.onrender.com — but if "aps-frontend" collides with
-      # someone else's service globally, Render will suffix it and you'll
-      # need to update this to match and redeploy.
+      # "aps-frontend" collided with an existing, unrelated Render service on
+      # first deploy, so this is the actual auto-suffixed hostname Render
+      # assigned — not the predictable https://aps-frontend.onrender.com.
+      # Check the dashboard if this ever needs to change.
       - key: CORS_ORIGINS
-        value: https://aps-frontend.onrender.com
+        value: https://aps-frontend-xek6.onrender.com
       - key: PYTHON_VERSION
         value: "3.11.9"
 
@@ -40,11 +40,11 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
-      # Same caveat as CORS_ORIGINS above — update if "aps-backend" collides.
-      # Baked in at build time (Vite), so changing this needs a rebuild, not
-      # just a restart.
+      # "aps-backend" also collided on first deploy — this is the real
+      # auto-suffixed hostname Render assigned. Baked in at build time
+      # (Vite), so changing this needs a rebuild, not just a restart.
       - key: VITE_API_BASE
-        value: https://aps-backend.onrender.com
+        value: https://aps-backend-q9br.onrender.com
     routes:
       - type: rewrite
         source: /*
