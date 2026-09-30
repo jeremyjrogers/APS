@@ -61,14 +61,21 @@ web service for the backend, and a static site for the frontend.
    checkout).
 2. In the Render dashboard: **New > Blueprint**, point it at the repo. It
    reads `render.yaml` and creates all three resources in one go.
-3. Once the backend is live, open a shell for the `aps-backend` service
-   (Render dashboard → Shell) and seed it once:
+3. Once the backend is live, seed the database once. Free web services have
+   no Shell/SSH access, so do this from your own machine against the
+   *external* database URL instead (Render dashboard → `aps-db` → External
+   Database URL — different from the internal one the backend service uses):
    ```bash
-   python scripts/seed.py --reset
+   cd backend
+   source .venv/bin/activate
+   DATABASE_URL="<external database URL from the Render dashboard>" python scripts/seed.py --reset
    ```
+   Setting `DATABASE_URL` inline like this only affects that one command —
+   your local `.env` (pointing at your local Docker Postgres) is untouched.
    Do this once after the first deploy — it's a full reset, not something to
    run on every deploy.
-4. Visit the `aps-frontend` service's URL.
+4. Visit the `aps-frontend` service's URL. On the Overview tab, click "Run
+   Planning" to confirm it's actually talking to the seeded database.
 
 **Known limitations of the free tier:**
 - Free Postgres expires 30 days after creation (14-day grace period after
@@ -77,6 +84,9 @@ web service for the backend, and a static site for the frontend.
 - The free backend spins down after 15 min idle; the first request after
   that takes about a minute to wake it back up. The frontend (a static site)
   has no such delay.
+- Free web services have no Shell/SSH access and no one-off jobs — hence
+  seeding from your local machine against the external DB URL instead of
+  in-dashboard.
 - `CORS_ORIGINS` and `VITE_API_BASE` in `render.yaml` are hardcoded to the
   services' predictable `https://<name>.onrender.com` URLs (Render's
   Blueprint cross-service references only expose private-network addressing,
