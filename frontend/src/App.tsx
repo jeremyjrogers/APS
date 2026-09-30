@@ -9,6 +9,8 @@ import OverhaulJobsTable from "./components/OverhaulJobsTable";
 import WorkOrdersTable from "./components/WorkOrdersTable";
 import PurchaseOrdersTable from "./components/PurchaseOrdersTable";
 import ActionLog from "./components/ActionLog";
+import MasterData from "./components/MasterData";
+import ImportData from "./components/ImportData";
 import type { PlanningRunResult } from "./api";
 
 const TABS = [
@@ -20,6 +22,8 @@ const TABS = [
   "Overhaul Jobs",
   "Work Orders",
   "Purchase Orders",
+  "Master Data",
+  "Import",
   "Action Log",
 ] as const;
 type Tab = (typeof TABS)[number];
@@ -58,6 +62,8 @@ function App() {
         {tab === "Overhaul Jobs" && <OverhaulJobsTable />}
         {tab === "Work Orders" && <WorkOrdersTable />}
         {tab === "Purchase Orders" && <PurchaseOrdersTable />}
+        {tab === "Master Data" && <MasterData />}
+        {tab === "Import" && <ImportData />}
         {tab === "Action Log" && <ActionLog />}
       </main>
     </div>
