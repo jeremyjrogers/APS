@@ -1,0 +1,73 @@
+:root {
+  --text: #4b5563;
+  --text-h: #08060d;
+  --bg: #fafafa;
+  --panel-bg: #fff;
+  --border: #e5e4e7;
+  --accent: #6d28d9;
+  --accent-bg: rgba(109, 40, 217, 0.08);
+
+  /* Status palette — fixed across light/dark by design (validated:
+     dataviz skill references/palette.md). Never repurpose these for a
+     categorical series. */
+  --green: #0ca30c;
+  --green-bg: rgba(12, 163, 12, 0.12);
+  --amber: #c98500;
+  --amber-bg: rgba(250, 178, 25, 0.16);
+  --red: #d03b3b;
+  --red-bg: rgba(208, 59, 59, 0.12);
+
+  /* Categorical series (fixed hue order — never cycled/reassigned) */
+  --series-1: #2a78d6; /* blue */
+  --series-2: #eb6834; /* orange */
+  --series-3: #1baf7a; /* aqua */
+  --chart-muted: #898781;
+  --chart-grid: var(--border);
+
+  font: 15px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #111214;
+    --panel-bg: #191a1e;
+    --border: #2e303a;
+    --accent: #c084fc;
+    --accent-bg: rgba(192, 132, 252, 0.12);
+    --green: #0ca30c;
+    --green-bg: rgba(12, 163, 12, 0.22);
+    --amber: #fab219;
+    --amber-bg: rgba(250, 178, 25, 0.22);
+    --red: #e66767;
+    --red-bg: rgba(230, 103, 103, 0.22);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --chart-muted: #898781;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1, h2 {
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
