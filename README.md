@@ -1,5 +1,10 @@
 # APS
 
+**Live demo:** https://aps-frontend-xek6.onrender.com — hosted on Render's
+free tier (see [Deploying](#deploying-render-free-tier) below). Give the
+backend a few seconds to wake up if it's been idle; the "Run Planning"
+button explains this if you hit it while it's still spinning up.
+
 Proof-of-concept advanced planning system for a single-plant pump/compressor
 manufacturer running two lines: Engineer/Configure-to-Order new-unit
 packages, and aftermarket parts manufacturing + repair/overhaul.
@@ -55,16 +60,43 @@ npm run dev
 ## Deploying (Render, free tier)
 
 `render.yaml` at the repo root defines a Blueprint: free Postgres, a Python
-web service for the backend, and a static site for the frontend.
+web service for the backend, and a static site for the frontend. The current
+live deployment:
+
+- Frontend: https://aps-frontend-xek6.onrender.com
+- Backend: https://aps-backend-q9br.onrender.com (`/health`, `/docs`)
+- Both names got auto-suffixed by Render because `aps-backend` and
+  `aps-frontend` were already taken by unrelated services — expect the same
+  on a fresh deploy under those names; `-xek6`/`-q9br` are specific to this
+  deployment, not something Render will reassign to you.
+
+### First-time setup
 
 1. Push this repo to GitHub (Render deploys from a repo, not a local
    checkout).
 2. In the Render dashboard: **New > Blueprint**, point it at the repo. It
    reads `render.yaml` and creates all three resources in one go.
-3. Once the backend is live, seed the database once. Free web services have
-   no Shell/SSH access, so do this from your own machine against the
-   *external* database URL instead (Render dashboard → `aps-db` → External
-   Database URL — different from the internal one the backend service uses):
+3. **Check the actual assigned URLs** for the backend and frontend services
+   (dashboard → each service → URL shown near the top). If either got
+   suffixed (likely — `aps-backend`/`aps-frontend` are common enough names to
+   collide), the `CORS_ORIGINS` and `VITE_API_BASE` values baked into
+   `render.yaml` will be wrong. Fix this **before** step 4:
+   - Backend service → **Environment** tab → set `CORS_ORIGINS` to the
+     frontend's actual URL.
+   - Frontend service → **Environment** tab → set `VITE_API_BASE` to the
+     backend's actual URL, then **Manual Deploy → Deploy latest commit** (Vite
+     bakes this in at build time, so saving the env var alone doesn't
+     rebuild it).
+   - **Editing `render.yaml` and pushing does not auto-apply env var changes
+     to already-created services** — confirmed the hard way. A normal code
+     push does trigger a rebuild/redeploy fine; it's specifically Blueprint
+     env var edits after initial creation that need the manual dashboard
+     step above. Once fixed, update the values in `render.yaml` too so the
+     file matches reality for the next person reading it.
+4. Seed the database once. Free web services have no Shell/SSH access, so do
+   this from your own machine against the *external* database URL instead
+   (Render dashboard → `aps-db` → External Database URL — different from the
+   internal one the backend service uses):
    ```bash
    cd backend
    source .venv/bin/activate
@@ -74,23 +106,22 @@ web service for the backend, and a static site for the frontend.
    your local `.env` (pointing at your local Docker Postgres) is untouched.
    Do this once after the first deploy — it's a full reset, not something to
    run on every deploy.
-4. Visit the `aps-frontend` service's URL. On the Overview tab, click "Run
-   Planning" to confirm it's actually talking to the seeded database.
+5. Visit the frontend URL. On the Overview tab, click "Run Planning" to
+   confirm it's actually talking to the seeded database.
 
 **Known limitations of the free tier:**
 - Free Postgres expires 30 days after creation (14-day grace period after
   that before deletion). For a short-lived demo this is fine; for anything
   longer, upgrade the database plan (~$7/mo) before day 30.
 - The free backend spins down after 15 min idle; the first request after
-  that takes about a minute to wake it back up. The frontend (a static site)
-  has no such delay.
+  that takes about a minute to wake it back up (the frontend has a note
+  about this on the "Run Planning" button). The frontend itself, as a static
+  site, has no such delay.
 - Free web services have no Shell/SSH access and no one-off jobs — hence
   seeding from your local machine against the external DB URL instead of
   in-dashboard.
-- `CORS_ORIGINS` and `VITE_API_BASE` in `render.yaml` are hardcoded to the
-  services' predictable `https://<name>.onrender.com` URLs (Render's
-  Blueprint cross-service references only expose private-network addressing,
-  which a browser can't reach). If either service name collides with an
-  existing Render service and gets auto-suffixed, update the corresponding
-  env var to match and redeploy — the frontend one needs a rebuild since
-  Vite bakes it in at build time, not just a restart.
+- Render's Blueprint `fromService` env var references only expose
+  private-network addressing (a hostname only reachable from other Render
+  services, not from a user's browser). `CORS_ORIGINS` and `VITE_API_BASE`
+  are plain hardcoded URLs in `render.yaml` for this reason, not
+  `fromService` references.
