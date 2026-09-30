@@ -1,5 +1,6 @@
 from app.models.aftermarket import SalesOrder
 from app.models.bom import Bom, BomLine, Routing, RoutingOperation
+from app.models.exception import PlanAction, PlanException
 from app.models.item import Item, ItemSupplier
 from app.models.overhaul import OverhaulFinding, OverhaulJob
 from app.models.project import MachineType, Project, ProjectMilestone
@@ -14,6 +15,8 @@ __all__ = [
     "RoutingOperation",
     "Item",
     "ItemSupplier",
+    "PlanAction",
+    "PlanException",
     "OverhaulFinding",
     "OverhaulJob",
     "MachineType",
