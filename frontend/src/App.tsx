@@ -1,14 +1,49 @@
+import { useState } from "react";
 import "./App.css";
+import Overview from "./components/Overview";
+import ProjectsTable from "./components/ProjectsTable";
+import SalesOrdersTable from "./components/SalesOrdersTable";
+import OverhaulJobsTable from "./components/OverhaulJobsTable";
+import WorkOrdersTable from "./components/WorkOrdersTable";
+import PurchaseOrdersTable from "./components/PurchaseOrdersTable";
+import type { PlanningRunResult } from "./api";
+
+const TABS = [
+  "Overview",
+  "Projects",
+  "Sales Orders",
+  "Overhaul Jobs",
+  "Work Orders",
+  "Purchase Orders",
+] as const;
+type Tab = (typeof TABS)[number];
 
 function App() {
+  const [tab, setTab] = useState<Tab>("Overview");
+  const [lastRun, setLastRun] = useState<PlanningRunResult | null>(null);
+
   return (
     <div className="app">
       <header className="app-header">
         <h1>APS Planning POC</h1>
         <span className="muted">Single-plant pump/compressor manufacturer — new-unit + aftermarket</span>
       </header>
+
+      <nav className="tabs">
+        {TABS.map((t) => (
+          <button key={t} className={t === tab ? "tab tab-active" : "tab"} onClick={() => setTab(t)}>
+            {t}
+          </button>
+        ))}
+      </nav>
+
       <main className="app-main">
-        <div className="panel">Dashboard coming soon.</div>
+        {tab === "Overview" && <Overview lastRun={lastRun} onRunComplete={setLastRun} />}
+        {tab === "Projects" && <ProjectsTable />}
+        {tab === "Sales Orders" && <SalesOrdersTable />}
+        {tab === "Overhaul Jobs" && <OverhaulJobsTable />}
+        {tab === "Work Orders" && <WorkOrdersTable />}
+        {tab === "Purchase Orders" && <PurchaseOrdersTable />}
       </main>
     </div>
   );
