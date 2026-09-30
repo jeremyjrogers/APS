@@ -75,6 +75,13 @@ export default function Overview({ onRunComplete, lastRun }: Props) {
           calendars; persists planned work orders and purchase orders.
         </p>
 
+        {running && (
+          <p className="muted running-note">
+            This can take up to a minute the first time — if the backend has been idle it's waking
+            back up from sleep on top of actually running the plan. It isn't stuck.
+          </p>
+        )}
+
         {lastRun && (
           <div className="run-result">
             <div className="card-grid">

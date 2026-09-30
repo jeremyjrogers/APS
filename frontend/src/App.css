@@ -579,6 +579,14 @@ button.secondary {
   font-size: 12px;
 }
 
+.running-note {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-radius: 6px;
+}
+
 /* --- Overhaul findings editor --- */
 .findings-editor {
   margin: 12px 0;
